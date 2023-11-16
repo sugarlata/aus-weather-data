@@ -1,8 +1,9 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../.."))
-import aus_weather_data
+if True:
+    sys.path.insert(0, os.path.abspath("../.."))
+    import aus_weather_data
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -24,14 +25,14 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.todo',
-    'sphinx_autodoc_typehints'
+    'sphinx_autodoc_typehints',
+    'sphinx.ext.githubpages'
 ]
 
 todo_include_todos = True
 
 templates_path = ['_templates']
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
