@@ -75,11 +75,12 @@ class BOMRadarLocationBase:
     _name: str
     _latitude: float
     _longitude: float
-    _base_radar_types: List[RADAR_TYPE] = [
+    _base_radar_types: set[RADAR_TYPE] = {
         RADAR_TYPE.REF_512_KM,
         RADAR_TYPE.REF_256_KM,
         RADAR_TYPE.REF_128_KM,
-    ]
+    }
+    radar_types: set[RADAR_TYPE]
 
     @classmethod
     def location(cls) -> tuple:

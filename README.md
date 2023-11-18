@@ -1,4 +1,4 @@
-## <p align="center">Ausstralian Weather Data</p>
+## <p align="center">Australian Weather Data</p>
 <!-- <p align="center"><a target="_blank" rel="noopener noreferrer" href="https://www.npmjs.com/package/@sugarlata/node-red-contrib-bible-gateway"><img src="https://img.shields.io/npm/v/@sugarlata/node-red-contrib-bible-gateway.svg" alt="Main" style="max-width: 100%;"></a></p> -->
 
 <p align="center">

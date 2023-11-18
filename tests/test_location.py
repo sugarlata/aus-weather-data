@@ -10,8 +10,8 @@ if True:
 
 
 def test_melbourne_radar_location():
-    assert BOMRadarLocation.IDR02.name == "Melbourne"
-    assert BOMRadarLocation.IDR02.location == (-37.86, 144.76)
+    assert BOMRadarLocation.IDR02.name() == "Melbourne"
+    assert BOMRadarLocation.IDR02.location() == (-37.86, 144.76)
     assert BOMRadarLocation.IDR02.radar_range(RADAR_TYPE.REF_64_KM) == (
         (-37.285074882984375, 144.03181231627426),
         (-37.285074882984375, 145.4881876837257),
@@ -30,8 +30,8 @@ def test_melbourne_radar_location():
 
 
 def test_bairnsdale_radar_location():
-    assert BOMRadarLocation.IDR68.name == "Bairnsdale"
-    assert BOMRadarLocation.IDR68.location == (-37.89, 147.56)
+    assert BOMRadarLocation.IDR68.name() == "Bairnsdale"
+    assert BOMRadarLocation.IDR68.location() == (-37.89, 147.56)
     assert BOMRadarLocation.IDR68.radar_range(RADAR_TYPE.REF_128_KM) == (
         (-36.74014976596879, 146.10312031938372),
         (-36.74014976596879, 149.0168796806163),

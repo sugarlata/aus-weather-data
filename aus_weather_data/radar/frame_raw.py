@@ -3,7 +3,7 @@ import time
 import datetime
 from zoneinfo import ZoneInfo
 from aus_weather_data.radar.utils import split_filename
-from typing import Union, ByteString
+from typing import ByteString, Optional
 
 
 class BOMRadarFrameRaw:
@@ -27,11 +27,11 @@ class BOMRadarFrameRaw:
         end_time: End time of the frame - generally start_time of the next frame in a sequence.
     """
 
-    tz: ZoneInfo = None
-    start_time: datetime.datetime = None
-    end_time: datetime.datetime = None
+    tz: ZoneInfo
+    start_time: datetime.datetime
+    end_time: datetime.datetime
 
-    def __init__(self, filename, data: Union[str, ByteString], tz: ZoneInfo = None):
+    def __init__(self, filename, data: str | ByteString, tz: Optional[ZoneInfo] = None):
         """Initialize the BOMRadarFrameRaw class
 
         This will create a RadarFrameRaw, data can be of type string  to load
@@ -50,7 +50,7 @@ class BOMRadarFrameRaw:
 
         if isinstance(data, str):
             self._data = self._load_from_file(data)
-        elif isinstance(data, ByteString):
+        elif type(data) == ByteString:
             self._data = data
 
         if tz:
