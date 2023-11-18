@@ -1,0 +1,212 @@
+import os
+import time
+import datetime
+from zoneinfo import ZoneInfo
+from aus_weather_data.radar.utils import split_filename
+from typing import Union, ByteString
+
+
+class BOMRadarFrameRaw:
+    """Radar Frame object for raw PNG data from BOM.
+
+    This is a class to hold metadata and radar data in raw PNG. See 
+    documentation for the functions in this class.
+
+    Start time covers the start of the time range that this frame 
+    covers. End time is end of the time range that this frame covers.
+    This value needs to be set after instantiation. Generally speaking 
+    this value is the start_time of the next frame in the sequence. 
+    Both start_time and end_time should be localized to UTC locale.
+
+    Locale dependent function will return according to the locale if 
+    set in tz. If tz is not set, defaults to UTC locale.
+
+    Attributes:
+        tz: Timezone for locale functions.
+        start_time: Start time of the frame. Auto populates from the date time extracted from the filename.
+        end_time: End time of the frame - generally start_time of the next frame in a sequence.
+    """
+
+    tz: ZoneInfo = None
+    start_time: datetime.datetime = None
+    end_time: datetime.datetime = None
+
+    def __init__(self, filename, data: Union[str, ByteString], tz: ZoneInfo = None):
+        """Initialize the BOMRadarFrameRaw class
+
+        This will create a RadarFrameRaw, data can be of type string  to load
+        from a file, in which case data should be the filename. Otherwise data
+        should be of type ByteString, which is the raw png data. 
+
+        Args:
+            filename: The name of the file
+            data: Either str for filename to load, or ByteString that is the data.
+            tz (optional): :class:`ZoneInfo` object passed for localizing datetime object.
+            """
+
+        self._filename: str = filename
+        self._metadata: dict = split_filename(filename)
+        self.start_time = self._metadata["dt"]
+
+        if isinstance(data, str):
+            self._data = self._load_from_file(data)
+        elif isinstance(data, ByteString):
+            self._data = data
+
+        if tz:
+            self.tz = tz
+
+    def _load_from_file(self, file_path: str) -> ByteString:
+        """Loads a radar frame from file
+
+        Args:
+            file_path: local path to the radar frame.
+
+        Returns:
+            A ByteString object containing the png data.
+        """
+
+        with open(file_path, 'rb') as f:
+            data = f.read()
+
+        return data
+
+    def save_to_file(self, file_path: str) -> None:
+        """Saves the radar frame to a png file
+
+        Args:
+            file_path: local path to save the frame png
+        """
+
+        with open(file_path, 'wb') as f:
+            f.write(self._data)
+
+    def __str__(self):
+        return f'BOMRadarFrameRaw(filename={self._filename})'
+
+    def __repr__(self):
+        return self.__str__()
+
+    @property
+    def radar_id(self) -> str:
+        """IDR extracted from the filename. EG. :literal:`IDR02` for Melbourne"""
+
+        return self._metadata["idr"]
+
+    @property
+    def radar_type(self) -> str:
+        """IDR type extracted from the filename. EG. :literal:`3` for 128km Reflectivity"""
+
+        return self._metadata["idrType"]
+
+    @property
+    def radar_id_type(self) -> str:
+        """IDR and Type extracted from the filename. EG. :literal:`IDR023` for Melbourne 128km Reflectivity"""
+
+        return self._metadata["idrIdType"]
+
+    @property
+    def epoch_time(self) -> float:
+        """Seconds since epoch for the start of the frame."""
+
+        return self.dt_utc.timestamp()
+
+    @property
+    def dt_utc(self) -> datetime.datetime:
+        """Datetime object that is timezone aware for UTC locale."""
+        return self._metadata["dt"]
+
+    @property
+    def dt_locale(self) -> datetime.datetime:
+        """Datetime object that is timezone aware for `tz` locale. If tz is None (default), then uses UTC locale."""
+
+        if self.tz:
+            return self.dt_utc.astimezone(self.tz)
+        else:
+            return self.dt_utc
+
+    @property
+    def year_utc(self) -> str:
+        """Year in UTC timezone (YYYY)."""
+        return self._metadata["year"]
+
+    @property
+    def year_loc(self) -> str:
+        """Year in locale timezone (YYYY)."""
+
+        return self.dt_locale.strftime("%Y")
+
+    @property
+    def month_utc(self) -> str:
+        """Month in UTC timezone (MM)."""
+        return self._metadata["month"]
+
+    @property
+    def month_loc(self) -> str:
+        """Month in locale timezone (MM)."""
+
+        return self.dt_locale.strftime("%m")
+
+    @property
+    def day_utc(self) -> str:
+        """Day in UTC timezone (DD)."""
+        return self._metadata["day"]
+
+    @property
+    def day_loc(self) -> str:
+        """Day in locale timezone (DD)."""
+
+        return self.dt_locale.strftime("%d")
+
+    @property
+    def hour_utc(self) -> str:
+        """Hour in UTC timezone (HH)."""
+        return self._metadata["hour"]
+
+    @property
+    def hour_loc(self) -> str:
+        """Hour in locale timezone (HH)."""
+
+        return self.dt_locale.strftime("%H")
+
+    @property
+    def minute_utc(self) -> str:
+        """Minute in UTC timezone (MM)."""
+        return self._metadata["minute"]
+
+    @property
+    def minute_loc(self) -> str:
+        """Minute in locale timezone (MM)."""
+
+        return self.dt_locale.strftime("%M")
+
+    @property
+    def date_utc(self) -> str:
+        """UTC date string (YYYY-MM-DD)."""
+        return self._metadata["date"]
+
+    @property
+    def date_locale(self) -> str:
+        """Locale date string (YYYY-MM-DD)"""
+        return self.dt_locale.strftime("%Y-%m-%d")
+
+    @property
+    def nice_date_utc(self) -> str:
+        """UTC date string fit for human consumption"""
+
+        return self.dt_utc.strftime("%Y-%m-%d %H:%M UTC")
+
+    @property
+    def nice_date_locale(self) -> str:
+        """Locale date string fit for human consumption"""
+
+        if self.tz:
+            return self.dt_locale.strftime(f"%Y-%m-%d %H:%M {self.tz.key}")
+        else:
+            return self.nice_date_utc
+
+    @property
+    def filename(self) -> str:
+        """Filename of the frame"""
+
+        return self._filename

@@ -1,4 +1,5 @@
 import math
+import datetime
 
 
 def get_translation_coordinate(latitude: float, longitude: float, distance: float, bearing: float) -> tuple:
@@ -26,3 +27,34 @@ def get_translation_coordinate(latitude: float, longitude: float, distance: floa
 
     # Coords back to degrees and return
     return (180. * lat / math.pi, 180. * lon / math.pi)
+
+
+def split_filename(filename: str) -> dict:
+    """Gets information from a filename
+
+    Splits the information in a filename.
+
+    Args:
+        filename: Filename of the radar frame from BOM. E.G: IDR024.T.202001312236.png 
+
+    Returns:
+        Dictionary with the keys: [filename, idr, idrType, idrIdType, year, month, day, hour, minute, date, dt].
+    """
+
+    return {
+        "filename": filename,
+        "idr": filename[0:5],
+        "idrType": filename[5:6],
+        "idrIdType": filename[0:6],
+        "year": filename[9:13],
+        "month": filename[13:15],
+        "day": filename[15:17],
+        "hour": filename[17:19],
+        "minute": filename[19:21],
+        "date": '{year}-{month}-{day}'.format(
+            year=filename[9:13],
+            month=filename[13:15],
+            day=filename[15:17]
+        ),
+        "dt": datetime.datetime.strptime(filename[9:21], "%Y%m%d%H%M").replace(tzinfo=datetime.timezone.utc)
+    }

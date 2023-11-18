@@ -18,3 +18,11 @@ Radar Location
 --------------
 .. autoclass:: BOMRadarLocation
    :members:
+
+Radar Frame Raw
+---------------
+
+The Radar Frame Raw object contains raw png data and metadata of a radar frame.
+
+.. autoclass:: BOMRadarFrameRaw
+   :members:
