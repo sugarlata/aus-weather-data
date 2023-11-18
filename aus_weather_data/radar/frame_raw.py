@@ -131,7 +131,7 @@ class BOMRadarFrameRaw:
         return self._metadata["year"]
 
     @property
-    def year_loc(self) -> str:
+    def year_locale(self) -> str:
         """Year in locale timezone (YYYY)."""
 
         return self.dt_locale.strftime("%Y")
@@ -142,7 +142,7 @@ class BOMRadarFrameRaw:
         return self._metadata["month"]
 
     @property
-    def month_loc(self) -> str:
+    def month_locale(self) -> str:
         """Month in locale timezone (MM)."""
 
         return self.dt_locale.strftime("%m")
@@ -153,7 +153,7 @@ class BOMRadarFrameRaw:
         return self._metadata["day"]
 
     @property
-    def day_loc(self) -> str:
+    def day_locale(self) -> str:
         """Day in locale timezone (DD)."""
 
         return self.dt_locale.strftime("%d")
@@ -164,7 +164,7 @@ class BOMRadarFrameRaw:
         return self._metadata["hour"]
 
     @property
-    def hour_loc(self) -> str:
+    def hour_locale(self) -> str:
         """Hour in locale timezone (HH)."""
 
         return self.dt_locale.strftime("%H")
@@ -175,7 +175,7 @@ class BOMRadarFrameRaw:
         return self._metadata["minute"]
 
     @property
-    def minute_loc(self) -> str:
+    def minute_locale(self) -> str:
         """Minute in locale timezone (MM)."""
 
         return self.dt_locale.strftime("%M")
@@ -210,3 +210,9 @@ class BOMRadarFrameRaw:
         """Filename of the frame"""
 
         return self._filename
+
+    @property
+    def data(self) -> ByteString:
+        """Binary Data png of the frame"""
+
+        return self._data
