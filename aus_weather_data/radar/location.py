@@ -101,6 +101,8 @@ class BOMRadarLocationBase:
             Name of the radar
         '''
 
+        return cls._name
+
     @classmethod
     def radar_range(cls, radar_type: RADAR_TYPE) -> tuple:
         '''
@@ -129,6 +131,9 @@ class BOMRadarLocationBase:
 
         if radar_type not in RADAR_TYPE:
             raise TypeError("radar_type should be a RADAR_TYPE")
+
+        if radar_type not in cls._radar_types:
+            raise TypeError(f"There is no {radar_type} for {cls._name}")
 
         if "64_KM" in radar_type.name:
             distance = 64
