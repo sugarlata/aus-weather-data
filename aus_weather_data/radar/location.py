@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Set
 from .utils import get_translation_coordinate
 
 
@@ -75,12 +75,12 @@ class BOMRadarLocationBase:
     _name: str
     _latitude: float
     _longitude: float
-    _base_radar_types: set[RADAR_TYPE] = {
+    _base_radar_types: Set[RADAR_TYPE] = {
         RADAR_TYPE.REF_512_KM,
         RADAR_TYPE.REF_256_KM,
         RADAR_TYPE.REF_128_KM,
     }
-    radar_types: set[RADAR_TYPE]
+    radar_types: Set[RADAR_TYPE]
 
     @classmethod
     def location(cls) -> tuple:
@@ -208,7 +208,7 @@ class BOMRadarLocation:
         _name = "Melbourne"
         _latitude = -37.86
         _longitude = 144.76
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -231,7 +231,7 @@ class BOMRadarLocation:
         _name = "Yarrawonga"
         _latitude = -36.03
         _longitude = 146.03
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM
@@ -250,7 +250,7 @@ class BOMRadarLocation:
         _name = "Bairnsdale"
         _latitude = -37.89
         _longitude = 147.56
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.VEL_128_KM,
         }
@@ -268,7 +268,7 @@ class BOMRadarLocation:
         _name = "Rainbow"
         _latitude = -35.99
         _longitude = 142.01
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -291,7 +291,7 @@ class BOMRadarLocation:
         _name = "Mildura"
         _latitude = -34.28
         _longitude = 141.59
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -314,7 +314,7 @@ class BOMRadarLocation:
         _name = "Wagga Wagga"
         _latitude = -35.17
         _longitude = 147.47
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types
         }
 
@@ -331,7 +331,7 @@ class BOMRadarLocation:
         _name = "Sydney"
         _latitude = -33.701
         _longitude = 151.21
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -354,7 +354,7 @@ class BOMRadarLocation:
         _name = "Wollongong"
         _latitude = -34.264
         _longitude = 150.874
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -377,7 +377,7 @@ class BOMRadarLocation:
         _name = "Yeoval"
         _latitude = -32.74
         _longitude = 148.7
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -400,7 +400,7 @@ class BOMRadarLocation:
         _name = "Canberra"
         _latitude = -35.66
         _longitude = 149.51
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -423,7 +423,7 @@ class BOMRadarLocation:
         _name = "Hillston"
         _latitude = -33.55
         _longitude = 145.52
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -446,7 +446,7 @@ class BOMRadarLocation:
         _name = "Adelaide (Buckland Park)"
         _latitude = -34.617
         _longitude = 138.469
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,
@@ -469,7 +469,7 @@ class BOMRadarLocation:
         _name = "Adelaide (Sellicks Hill)"
         _latitude = -35.33
         _longitude = 138.5
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.RAI_128_KM_1H,
             RADAR_TYPE.RAI_128_KM_24H,
@@ -490,7 +490,7 @@ class BOMRadarLocation:
         _name = "Ceduna"
         _latitude = -32.13
         _longitude = 133.7
-        radar_types: set[RADAR_TYPE] = {
+        radar_types: Set[RADAR_TYPE] = {
             *BOMRadarLocationBase._base_radar_types,
             RADAR_TYPE.REF_64_KM,
             RADAR_TYPE.VEL_128_KM,

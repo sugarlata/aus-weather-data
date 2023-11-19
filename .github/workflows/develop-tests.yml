@@ -8,7 +8,7 @@ permissions:
   contents: read
 
 jobs:
-  Python_Unit_Tests:
+  Python_Tests:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,3 +24,5 @@ jobs:
         run: pip install -r dev-requirements.txt
       - name: Run Python Tests
         run: pytest
+      - name: Run Python Type Checking
+        run: mypy aus_weather_data

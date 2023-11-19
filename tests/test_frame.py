@@ -1,8 +1,9 @@
 import os
 import sys
+import pytz
 import base64
 import datetime
-from zoneinfo import ZoneInfo
+
 
 if True:
     sys.path.insert(0, os.path.abspath("."))
@@ -85,7 +86,9 @@ def test_radar_metadata():
             f'{filename_base}.png'
         ]))
 
-    frame.tz = ZoneInfo('Australia/Melbourne')
+    timezone = pytz.timezone('Australia/Melbourne')
+    frame.tz = timezone
+
 
     assert frame.radar_id == "IDR02"
     assert frame.radar_type == "4"
@@ -97,8 +100,8 @@ def test_radar_metadata():
 
     assert frame.dt_locale == datetime.datetime(
         2020, 1, 31, 23, 24, 0, 0, datetime.timezone.utc
-    ).astimezone(ZoneInfo('Australia/Melbourne'))
-
+    ).astimezone(timezone)
+    
     assert frame.year_utc == "2020"
     assert frame.month_utc == "01"
     assert frame.day_utc == "31"

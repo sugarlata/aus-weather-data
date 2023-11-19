@@ -1,9 +1,9 @@
 import os
 import time
+import pytz
 import datetime
-from zoneinfo import ZoneInfo
 from aus_weather_data.radar.utils import split_filename
-from typing import ByteString, Optional
+from typing import ByteString, Optional, Union
 
 
 class BOMRadarFrameRaw:
@@ -27,11 +27,11 @@ class BOMRadarFrameRaw:
         end_time: End time of the frame - generally start_time of the next frame in a sequence.
     """
 
-    tz: ZoneInfo
+    tz: pytz.BaseTzInfo
     start_time: datetime.datetime
     end_time: datetime.datetime
 
-    def __init__(self, filename, data: str | ByteString, tz: Optional[ZoneInfo] = None):
+    def __init__(self, filename, data: Union[str, ByteString], tz: Optional[pytz.BaseTzInfo] = None):
         """Initialize the BOMRadarFrameRaw class
 
         This will create a RadarFrameRaw, data can be of type string  to load
@@ -41,7 +41,7 @@ class BOMRadarFrameRaw:
         Args:
             filename: The name of the file
             data: Either str for filename to load, or ByteString that is the data.
-            tz (optional): :class:`ZoneInfo` object passed for localizing datetime object.
+            tz (optional): :class:`pytz.timezone` object passed for localizing datetime object.
             """
 
         self._filename: str = filename
@@ -201,7 +201,7 @@ class BOMRadarFrameRaw:
         """Locale date string fit for human consumption"""
 
         if self.tz:
-            return self.dt_locale.strftime(f"%Y-%m-%d %H:%M {self.tz.key}")
+            return self.dt_locale.strftime(f"%Y-%m-%d %H:%M {self.tz.zone}")
         else:
             return self.nice_date_utc
 
