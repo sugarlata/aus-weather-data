@@ -13,10 +13,10 @@ def test_melbourne_radar_location():
     assert BOMRadarLocation.IDR02.name() == "Melbourne"
     assert BOMRadarLocation.IDR02.location() == (-37.86, 144.76)
     assert BOMRadarLocation.IDR02.radar_range(RADAR_TYPE.REF_64_KM) == (
-        (-37.285074882984375, 144.03181231627426),
-        (-37.285074882984375, 145.4881876837257),
-        (-38.4349251170156, 145.4881876837257),
-        (-38.4349251170156, 144.03181231627426)
+        (-37.28507, 144.03181),
+        (-37.28507, 145.48819),
+        (-38.43493, 145.48819),
+        (-38.43493, 144.03181)
     )
     assert RADAR_TYPE.REF_64_KM in BOMRadarLocation.IDR02.radar_types
     assert RADAR_TYPE.REF_128_KM in BOMRadarLocation.IDR02.radar_types
@@ -33,10 +33,10 @@ def test_bairnsdale_radar_location():
     assert BOMRadarLocation.IDR68.name() == "Bairnsdale"
     assert BOMRadarLocation.IDR68.location() == (-37.89, 147.56)
     assert BOMRadarLocation.IDR68.radar_range(RADAR_TYPE.REF_128_KM) == (
-        (-36.74014976596879, 146.10312031938372),
-        (-36.74014976596879, 149.0168796806163),
-        (-39.03985023403123, 149.0168796806163),
-        (-39.03985023403123, 146.10312031938372)
+        (-36.74015, 146.10312),
+        (-36.74015, 149.01688),
+        (-39.03985, 149.01688),
+        (-39.03985, 146.10312)
     )
     assert RADAR_TYPE.REF_64_KM not in BOMRadarLocation.IDR68.radar_types
     assert RADAR_TYPE.REF_128_KM in BOMRadarLocation.IDR68.radar_types

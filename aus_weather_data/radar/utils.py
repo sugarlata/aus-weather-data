@@ -26,7 +26,7 @@ def get_translation_coordinate(latitude: float, longitude: float, distance: floa
                       math.cos(lat), math.cos(distance/R)-math.sin(lat)*math.sin(lat))
 
     # Coords back to degrees and return
-    return (180. * lat / math.pi, 180. * lon / math.pi)
+    return (round(180. * lat / math.pi, 5), round(180. * lon / math.pi, 5))
 
 
 def split_filename(filename: str) -> dict:
