@@ -2,7 +2,7 @@ name: Develop Branch Tests
 
 on:
   push:
-    branches: [develop]
+    branches: [main]
 
 permissions:
   contents: read
@@ -20,11 +20,11 @@ jobs:
         with: 
           python-version: ${{matrix.python-version}}
           cache: 'pip'
+      - name: Install Pipenv
+        run: pip install pipenv
       - name: Install Dependencies
-        run: pip install -r requirements.txt
-      - name: Install Test Dependencies
-        run: pip install -r dev-requirements.txt
+        run: pipenv install --dev
       - name: Run Python Tests
-        run: pytest
+        run: pipenv run pytest
       - name: Run Python Type Checking
-        run: mypy aus_weather_data
+        run: pipenv run mypy aus_weather_data
