@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+tzdata = "*"
+pytz = "*"
+
+[dev-packages]
+pytest = "*"
+mypy = "*"
+types-pytz = "*"
+sphinx = "*"
+sphinx-autodoc-typehints = "*"
+furo = "*"
+
+[requires]
+python_version = "3.7"
