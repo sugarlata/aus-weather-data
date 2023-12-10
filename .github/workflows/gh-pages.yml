@@ -22,8 +22,8 @@ jobs:
         cache: 'pip'
     - name: Install Pipenv
       run: pip install pipenv
-    - name: Install Dependencies
-      run: pipenv install --dev
+    - name: Create Sphinx Dependencies
+      run: pipenv requirements --dev > ./docs/requirements.txt
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
