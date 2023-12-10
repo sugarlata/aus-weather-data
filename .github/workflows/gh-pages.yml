@@ -14,22 +14,41 @@ jobs:
       pages: write
       id-token: write
     steps:
+
     - uses: actions/checkout@v4
     - name: Set up Python 3.9
       uses: actions/setup-python@v4
       with: 
         python-version: 3.9
         cache: 'pip'
+
+    - name: Upgrade Pip
+      run: pip install --upgrade pip
+
+    - name: Get Pip Cache Dir
+      id: pip-cache
+      run: echo "::set-output name=dir::$(pip cache dir)"
+
     - name: Install Pipenv
       run: pip install pipenv
-    - name: Create Sphinx Dependencies
-      run: pipenv requirements --dev > ./docs/requirements.txt
+      
+    - name: Get Pipenv Dev Dependencies
+      run: pipenv requirements --dev > dev-requirements.txt
+
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/dev-requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Build Documentation
+      run: ./docs/./make html
+
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
-        python_version: 3.9
-        sphinx_version: 7.2.6
-        documentation_path: ./docs/source
+        documentation_path: ./docs/build/html
+        requirements_path: ./dev-requirements.txt
         cache: true
-        checkout: true
-        publish: true
