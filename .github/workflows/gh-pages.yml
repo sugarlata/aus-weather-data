@@ -47,6 +47,5 @@ jobs:
       uses: sphinx-notes/pages@v3
       with:
         checkout: false
-        documentation_path: ./docs/build/html
         requirements_path: ./dev-requirements.txt
         cache: true
