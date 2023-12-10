@@ -3,7 +3,7 @@
 
 <p align="center">
 <a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlata/aus_weather_data/tree/main"><img src="https://github.com/sugarlata/aus_weather_data/actions/workflows/main.yml/badge.svg?branch=main" alt="Main" style="max-width: 100%;"></a>
-<a target="_blank" rel="noopener noreferrer" href="https://github.com/sugarlata/aus_weather_data/tree/develop"><img src="https://github.com/sugarlata/aus_weather_data/actions/workflows/develop-tests.yml/badge.svg?branch=develop" alt="Develop" style="max-width: 100%;"></a>
+<a target="_blank" rel="noopener noreferrer" href="https://sugarlata.github.io/aus_weather_data/"><img src="https://github.com/sugarlata/aus_weather_data/actions/workflows/gh-pages.yml/badge.svg?branch=main" alt="Github Pages Build" style="max-width: 100%;"></a>
 </p>
 
 The Australian Weather Data Python package serves as a python package for accessing weather-related information specific to Australia. Designed to simplify the retrieval and analysis of publicy available data, this package contains interfaces to connect with relevant data sources to provide users with weather information for various locations. The package offers a user-friendly experience, allowing developers, researchers, and weather enthusiasts to effortlessly integrate Australian weather data into their projects, analyses, or applications.
