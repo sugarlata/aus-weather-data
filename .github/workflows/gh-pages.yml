@@ -14,10 +14,20 @@ jobs:
       pages: write
       id-token: write
     steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v4
+      with: 
+        python-version: 3.7
+        cache: 'pip'
+    - name: Install Pipenv
+      run: pip install pipenv
+    - name: Install Dependencies
+      run: pipenv install --dev
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
-        python_version: 3.9
+        python_version: 3.7
         sphinx_version: 7.2.6
         documentation_path: ./docs/source
         cache: true
