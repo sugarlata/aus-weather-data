@@ -43,9 +43,6 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-pip-
 
-    - name: Build Documentation
-      run: ./docs/./make html
-
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
