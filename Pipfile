@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 tzdata = "*"
 pytz = "*"
+ftputil = "*"
 
 [dev-packages]
 pytest = "*"
@@ -14,6 +15,8 @@ types-pytz = "*"
 sphinx = "*"
 sphinx-autodoc-typehints = "*"
 furo = "*"
+black = "*"
+esbonio = "*"
 
 [requires]
 python_version = "3"
