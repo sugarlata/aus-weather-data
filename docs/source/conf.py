@@ -13,25 +13,25 @@ if True:
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Australian Weather Data'
-copyright = '2023, Nathan Sgarlata'
-author = 'Nathan Sgarlata'
-release = '0.0.1'
+project = "Australian Weather Data"
+copyright = "2023, Nathan Sgarlata"
+author = "Nathan Sgarlata"
+release = "0.0.1"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
-    'sphinx_autodoc_typehints',
-    'sphinx.ext.githubpages'
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinx_autodoc_typehints",
+    "sphinx.ext.githubpages",
 ]
 
 todo_include_todos = True
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
 
 # -- Options for HTML output -------------------------------------------------
@@ -39,4 +39,4 @@ exclude_patterns = []
 
 
 html_theme = "furo"
-html_static_path = ['_static']
+html_static_path = ["_static"]
