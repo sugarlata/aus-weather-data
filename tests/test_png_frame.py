@@ -1,10 +1,9 @@
 import os
-import sys
 import pytz
 import base64
 import datetime
 
-from aus_weather_data import BOMRadarFramePNG, BOMRadarPNGLocalFile
+from aus_weather_data import BOMRadarFramePNG, BOMRadarPNGLocalFile, RADAR_TYPE, BOMRadarLocation
 
 # TODO Need to add in a test case here for difference between UTC year and locale year.
 
@@ -64,9 +63,12 @@ def test_radar_metadata():
     timezone = pytz.timezone("Australia/Melbourne")
     frame.tz = timezone
 
-    assert frame.radar_id == "IDR02"
-    assert frame.radar_type == "4"
-    assert frame.radar_id_type == "IDR024"
+    assert frame.radar_id_str == "IDR02"
+    assert frame.radar_type_str == "4"
+    assert frame.radar_id_type_str == "IDR024"
+
+    assert frame.radar_id == BOMRadarLocation.IDR02
+    assert frame.radar_type == RADAR_TYPE.REF_64_KM
 
     assert frame.dt_utc == datetime.datetime(
         2020, 1, 31, 23, 24, 0, 0, datetime.timezone.utc

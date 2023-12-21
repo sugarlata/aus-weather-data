@@ -258,7 +258,8 @@ class BOMRadarLocation:
         _name = "Wagga Wagga"
         _latitude = -35.17
         _longitude = 147.47
-        radar_types: Set[RADAR_TYPE] = {*BOMRadarLocationBase._base_radar_types}
+        radar_types: Set[RADAR_TYPE] = {
+            *BOMRadarLocationBase._base_radar_types}
 
     class IDR71(BOMRadarLocationBase):
         """
@@ -444,7 +445,7 @@ class BOMRadarLocation:
 
 
 RADAR_LOCATION_MAP: dict[str, BOMRadarLocationBase] = {
-    x.base(): x
-    for x in BOMRadarLocation.__dict__.values()
-    if isinstance(x, BOMRadarLocationBase)
+    k: v
+    for k, v in BOMRadarLocation.__dict__.items()
+    if 'IDR' in k
 }

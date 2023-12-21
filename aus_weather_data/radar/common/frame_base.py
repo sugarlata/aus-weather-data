@@ -1,6 +1,8 @@
 import pytz
 import datetime
-from aus_weather_data.radar.common.utils import split_filename
+from .utils import split_filename
+from .location import BOMRadarLocationBase, RADAR_LOCATION_MAP
+from .types import RADAR_TYPE, RADAR_TYPE_MAP
 from typing import Optional
 
 
@@ -59,19 +61,31 @@ class BOMRadarFrameBase:
         return self.__str__()
 
     @property
-    def radar_id(self) -> str:
+    def radar_id_str(self) -> str:
         """IDR extracted from the filename. EG. :literal:`IDR02` for Melbourne"""
 
         return self._metadata["idr"]
 
     @property
-    def radar_type(self) -> str:
+    def radar_id(self) -> BOMRadarLocationBase:
+        """Returns the radar ID as a :class:`BOMRadarLocationBase` object"""
+
+        return RADAR_LOCATION_MAP[self.radar_id_str]
+
+    @property
+    def radar_type_str(self) -> str:
         """IDR type extracted from the filename. EG. :literal:`3` for 128km Reflectivity"""
 
         return self._metadata["idrType"]
 
     @property
-    def radar_id_type(self) -> str:
+    def radar_type(self) -> RADAR_TYPE:
+        """Returns the radar type as a :class:`RADAR_TYPE` object"""
+
+        return RADAR_TYPE_MAP[self.radar_type_str]
+
+    @property
+    def radar_id_type_str(self) -> str:
         """IDR and Type extracted from the filename. EG. :literal:`IDR023` for Melbourne 128km Reflectivity"""
 
         return self._metadata["idrIdType"]

@@ -53,12 +53,13 @@ class BOMRadarDownload(BOMFTPPool):
     @log(logger=logger)
     def get_radar_frames(
         self,
-        radar_locations: Union[list[BOMRadarLocationBase], BOMRadarLocationBase] = None,
+        radar_locations: Union[list[BOMRadarLocationBase],
+                               BOMRadarLocationBase] = None,
         radar_types: Union[list[RADAR_TYPE], RADAR_TYPE] = None,
         start_time: datetime.datetime = None,
         end_time: datetime.datetime = None,
         ignore_list: list[str] = None,
-    ) -> dict[BOMRadarLocationBase : dict[RADAR_TYPE : list[BOMRadarFramePNG]]]:
+    ) -> dict[BOMRadarLocationBase: dict[RADAR_TYPE: list[BOMRadarFramePNG]]]:
         """Download radar data for the given radar and time range.
 
         Args:
@@ -109,7 +110,7 @@ class BOMRadarDownload(BOMFTPPool):
 
         frames: list = self._get_frames(matching_filenames)
 
-        # breakpoint()
+        breakpoint()
 
     @log(logger=logger)
     def _get_matching_files(
@@ -167,9 +168,11 @@ class BOMRadarDownload(BOMFTPPool):
                 x for x in filtered_list if start_time <= x.get("dt") <= end_time
             ]
         elif start_time:
-            filtered_list = [x for x in filtered_list if start_time <= x.get("dt")]
+            filtered_list = [
+                x for x in filtered_list if start_time <= x.get("dt")]
         elif end_time:
-            filtered_list = [x for x in filtered_list if x.get("dt") <= end_time]
+            filtered_list = [
+                x for x in filtered_list if x.get("dt") <= end_time]
 
         # Return just filenames
         return [x["filename"] for x in filtered_list]
