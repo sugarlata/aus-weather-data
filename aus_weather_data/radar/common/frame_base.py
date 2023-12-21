@@ -1,24 +1,22 @@
-import os
-import time
 import pytz
 import datetime
-from aus_weather_data.radar.utils import split_filename
-from typing import ByteString, Optional, Union
+from aus_weather_data.radar.common.utils import split_filename
+from typing import Optional
 
 
-class BOMRadarFrameRaw:
+class BOMRadarFrameBase:
     """Radar Frame object for raw PNG data from BOM.
 
-    This is a class to hold metadata and radar data in raw PNG. See 
+    This is a class to hold metadata and radar data in raw PNG. See
     documentation for the functions in this class.
 
-    Start time covers the start of the time range that this frame 
+    Start time covers the start of the time range that this frame
     covers. End time is end of the time range that this frame covers.
-    This value needs to be set after instantiation. Generally speaking 
-    this value is the start_time of the next frame in the sequence. 
+    This value needs to be set after instantiation. Generally speaking
+    this value is the start_time of the next frame in the sequence.
     Both start_time and end_time should be localized to UTC locale.
 
-    Locale dependent function will return according to the locale if 
+    Locale dependent function will return according to the locale if
     set in tz. If tz is not set, defaults to UTC locale.
 
     Attributes:
@@ -31,58 +29,31 @@ class BOMRadarFrameRaw:
     start_time: datetime.datetime
     end_time: datetime.datetime
 
-    def __init__(self, filename, data: Union[str, ByteString], tz: Optional[pytz.BaseTzInfo] = None):
+    def __init__(
+        self,
+        filename: str,
+        tz: Optional[pytz.BaseTzInfo] = None,
+    ):
         """Initialize the BOMRadarFrameRaw class
 
         This will create a RadarFrameRaw, data can be of type string  to load
         from a file, in which case data should be the filename. Otherwise data
-        should be of type ByteString, which is the raw png data. 
+        should be of type ByteString, which is the raw png data.
 
         Args:
-            filename: The name of the file
-            data: Either str for filename to load, or ByteString that is the data.
+            data: Either :class:`LocalBOMRadarFile` or :class:`RemoteBOMRadarFile` to load.
             tz (optional): :class:`pytz.timezone` object passed for localizing datetime object.
-            """
+        """
 
         self._filename: str = filename
-        self._metadata: dict = split_filename(filename)
+        self._metadata: dict = split_filename(self._filename)
         self.start_time = self._metadata["dt"]
-
-        if isinstance(data, str):
-            self._data = self._load_from_file(data)
-        elif type(data) == ByteString:
-            self._data = data
 
         if tz:
             self.tz = tz
 
-    def _load_from_file(self, file_path: str) -> ByteString:
-        """Loads a radar frame from file
-
-        Args:
-            file_path: local path to the radar frame.
-
-        Returns:
-            A ByteString object containing the png data.
-        """
-
-        with open(file_path, 'rb') as f:
-            data = f.read()
-
-        return data
-
-    def save_to_file(self, file_path: str) -> None:
-        """Saves the radar frame to a png file
-
-        Args:
-            file_path: local path to save the frame png
-        """
-
-        with open(file_path, 'wb') as f:
-            f.write(self._data)
-
     def __str__(self):
-        return f'BOMRadarFrameRaw(filename={self._filename})'
+        return f"BOMRadarFrame(filename={self._filename})"
 
     def __repr__(self):
         return self.__str__()
@@ -210,9 +181,3 @@ class BOMRadarFrameRaw:
         """Filename of the frame"""
 
         return self._filename
-
-    @property
-    def data(self) -> ByteString:
-        """Binary Data png of the frame"""
-
-        return self._data
