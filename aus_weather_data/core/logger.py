@@ -33,6 +33,8 @@ def log(logger):
                 logger.exception(f"Exception raised in {func.__name__}")
                 raise e
 
+        wrapper.__name__ += f"{func.__name__}"
+
         return wrapper
 
     return decorator

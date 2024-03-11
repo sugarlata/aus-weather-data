@@ -55,5 +55,11 @@ class RADAR_TYPE(Enum):
     Rainfall in last 24 hours for 128km range
     """
 
+    def __str__(self):
+        return f"RADAR_TYPE<{self.name}>"
+
+    def __repr__(self):
+        return self.__str__()
+
 
 RADAR_TYPE_MAP: dict[str:RADAR_TYPE] = {x.value: x for x in RADAR_TYPE}
