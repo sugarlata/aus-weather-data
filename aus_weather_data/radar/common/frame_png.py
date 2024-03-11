@@ -4,7 +4,7 @@ import pytz
 import datetime
 from aus_weather_data.radar.common.utils import split_filename
 from .frame_base import BOMRadarFrameBase
-from aus_weather_data.radar.common import BOMRadarPNGFile
+from aus_weather_data.radar.common import BOMRadarFile
 from aus_weather_data.radar.local import BOMRadarPNGLocalFile
 from typing import Optional
 
@@ -36,7 +36,7 @@ class BOMRadarFramePNG(BOMRadarFrameBase):
 
     def __init__(
         self,
-        radar_file: BOMRadarPNGFile,
+        radar_file: BOMRadarFile,
         tz: Optional[pytz.BaseTzInfo] = None,
     ):
         """Initialize the BOMRadarFrameRaw class

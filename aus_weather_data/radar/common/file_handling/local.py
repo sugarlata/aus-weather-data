@@ -3,7 +3,7 @@ import logging
 
 from typing import Union
 
-from aus_weather_data.radar.common import BOMRadarPNGFile
+from aus_weather_data.radar.common import BOMRadarFile
 
 from aus_weather_data.core.logger import (
     log,
@@ -31,11 +31,11 @@ if LOG_STREAM:
     logger.addHandler(stream_handler)
 
 
-class BOMRadarPNGLocalFile(BOMRadarPNGFile):
+class BOMRadarPNGLocalFile(BOMRadarFile):
     """Class to read and write local BOM radar files."""
 
     def __init__(self, filename: str, path: Union[str, None] = None):
-        """Initialize the LocalBOMRadarFile class.
+        """Initialize the BOMRadarPNGLocalFile class.
 
         Args:
             filename: The filename of the radar frame.

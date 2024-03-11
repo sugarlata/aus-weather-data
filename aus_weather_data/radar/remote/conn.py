@@ -4,7 +4,7 @@ import threading
 
 from io import BytesIO
 
-from .file_handling import BOMRadarPNGRemoteFile
+from ..common.file_handling.remote import BOMRadarPNGRemoteFile
 from aus_weather_data.core.logger import (
     log,
     LOG_FORMAT,
@@ -37,7 +37,7 @@ if LOG_STREAM:
     logger.addHandler(stream_handler)
 
 
-class BOMFTPConn:
+class BOMFTPConn(object):
     """
     BOM FTP Connection class
 

@@ -6,7 +6,7 @@ from .types import RADAR_TYPE, RADAR_TYPE_MAP
 from typing import Optional
 
 
-class BOMRadarFrameBase:
+class BOMRadarFrameBase(object):
     """Radar Frame object for raw PNG data from BOM.
 
     This is a class to hold metadata and radar data in raw PNG. See

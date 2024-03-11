@@ -1,8 +1,8 @@
 from typing import Union
-from aus_weather_data.radar.common import BOMRadarPNGFile
+from aus_weather_data.radar.common import BOMRadarFile
 
 
-class BOMRadarPNGRemoteFile(BOMRadarPNGFile):
+class BOMRadarPNGRemoteFile(BOMRadarFile):
     """Class to read remote BOM radar files."""
 
     def __init__(self, filename: str, path: Union[str, None] = None):

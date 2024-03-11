@@ -1,7 +1,7 @@
 from typing import Union
 
 
-class BOMRadarPNGFile:
+class BOMRadarFile(object):
     """Base Class for BOM radar files."""
 
     def __init__(self, filename: str, path: Union[str, None] = None):
