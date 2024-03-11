@@ -10,7 +10,7 @@ Radar Types
 
 Radar Location (Base)
 ---------------------
-.. autoclass:: aus_weather_data.radar.location.BOMRadarLocationBase
+.. autoclass:: aus_weather_data.radar.location.BOMRadarLocation
    :members:
    :inherited-members:
 
