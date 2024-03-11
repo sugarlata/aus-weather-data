@@ -78,7 +78,7 @@ class BOMRadarFramePNG(BOMRadarFrameBase):
         return radar_file
 
     def __str__(self):
-        return f"BOMRadarFramePNG(filename={self._filename})"
+        return f"BOMRadarFramePNG<{self._filename}>"
 
     @property
     def data(self) -> bytes:
