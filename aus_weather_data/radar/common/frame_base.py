@@ -1,7 +1,7 @@
 import pytz
 import datetime
 from .utils import split_filename
-from .location import BOMRadarLocationBase, RADAR_LOCATION_MAP
+from .location import RADAR_LOCATION_MAP, BOMRadarLocation
 from .types import RADAR_TYPE, RADAR_TYPE_MAP
 from typing import Optional
 
@@ -55,7 +55,7 @@ class BOMRadarFrameBase:
             self.tz = tz
 
     def __str__(self):
-        return f"BOMRadarFrame(filename={self._filename})"
+        return f"BOMRadarFrame<filename={self._filename}>"
 
     def __repr__(self):
         return self.__str__()
@@ -67,8 +67,8 @@ class BOMRadarFrameBase:
         return self._metadata["idr"]
 
     @property
-    def radar_id(self) -> BOMRadarLocationBase:
-        """Returns the radar ID as a :class:`BOMRadarLocationBase` object"""
+    def radar_id(self) -> BOMRadarLocation:
+        """Returns the radar ID as a :class:`BOMRadarLocation` object"""
 
         return RADAR_LOCATION_MAP[self.radar_id_str]
 
