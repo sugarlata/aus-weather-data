@@ -7,9 +7,10 @@ from aus_weather_data import BOMRadarLocation, RADAR_TYPE
 
 
 def test_melbourne_radar_location():
-    assert BOMRadarLocation.IDR02.name() == "Melbourne"
-    assert BOMRadarLocation.IDR02.base() == "IDR02"
-    assert BOMRadarLocation.IDR02.location() == (-37.86, 144.76)
+
+    assert BOMRadarLocation.IDR02.location_name == "Melbourne"
+    assert BOMRadarLocation.IDR02.base == "IDR02"
+    assert BOMRadarLocation.IDR02.location == (-37.86, 144.76)
     assert BOMRadarLocation.IDR02.radar_range(RADAR_TYPE.REF_64_KM) == (
         (-37.28507, 144.03181),
         (-37.28507, 145.48819),
@@ -28,9 +29,9 @@ def test_melbourne_radar_location():
 
 
 def test_bairnsdale_radar_location():
-    assert BOMRadarLocation.IDR68.name() == "Bairnsdale"
-    assert BOMRadarLocation.IDR68.base() == "IDR68"
-    assert BOMRadarLocation.IDR68.location() == (-37.89, 147.56)
+    assert BOMRadarLocation.IDR68.location_name == "Bairnsdale"
+    assert BOMRadarLocation.IDR68.base == "IDR68"
+    assert BOMRadarLocation.IDR68.location == (-37.89, 147.56)
     assert BOMRadarLocation.IDR68.radar_range(RADAR_TYPE.REF_128_KM) == (
         (-36.74015, 146.10312),
         (-36.74015, 149.01688),

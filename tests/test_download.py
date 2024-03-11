@@ -1,21 +1,18 @@
-import os
-import sys
-import pytz
-import base64
 import datetime
 
 from aus_weather_data import BOMRadarDownload, BOMRadarLocation, RADAR_TYPE
 
 
 def test_download():
+
     radar_download = BOMRadarDownload()
 
     with radar_download:
-        radar_download.get_radar_frames(
+        frames = radar_download.get_radar_frames(
             BOMRadarLocation.IDR02,
             RADAR_TYPE.REF_128_KM,
             datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc)
-            - datetime.timedelta(minutes=30),
+            - datetime.timedelta(hours=2),
             datetime.datetime.utcnow().replace(tzinfo=datetime.timezone.utc),
             [
                 "IDR98I.T.202312132024.png",
