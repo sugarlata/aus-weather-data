@@ -4,6 +4,7 @@ import datetime
 import logging
 
 from typing import Union
+from collections import defaultdict
 
 from pytz import BaseTzInfo
 
@@ -12,7 +13,7 @@ from .common import (
     RADAR_TYPE,
     split_filename,
     BOMRadarFramePNG,
-    BOMRadarLocationBase,
+    BOMRadarLocation,
 )
 
 from .remote import BOMFTPConn, BOMFTPPool, BOMRadarPNGRemoteFile
@@ -26,7 +27,7 @@ from ..core.logger import (
 )
 
 # Log level for this file. Default pull from global values. Can override here.
-LOG_LEVEL = GLOBAL_LOG_LEVEL
+LOG_LEVEL = logging.INFO
 LOG_FILE = GLOBAL_LOG_FILE
 LOG_STREAM = GLOBAL_LOG_STREAM
 
@@ -44,22 +45,29 @@ if LOG_STREAM:
 
 
 class BOMRadarDownload(BOMFTPPool):
-    def __init__(self) -> None:
+
+    _progress = {
+        "total": 0,
+        "current": 0
+    }
+
+    def __init__(self, connections_count: int = 10) -> None:
         """
         Initiate the Radar Download FTP connection.
         """
-        super().__init__()
+        self._connections_count = connections_count
+        super().__init__(connections=connections_count)
 
-    @log(logger=logger)
+    # @log(logger=logger)
     def get_radar_frames(
         self,
-        radar_locations: Union[list[BOMRadarLocationBase],
-                               BOMRadarLocationBase] = None,
+        radar_locations: Union[list[BOMRadarLocation],
+                               BOMRadarLocation] = None,
         radar_types: Union[list[RADAR_TYPE], RADAR_TYPE] = None,
         start_time: datetime.datetime = None,
         end_time: datetime.datetime = None,
         ignore_list: list[str] = None,
-    ) -> dict[BOMRadarLocationBase: dict[RADAR_TYPE: list[BOMRadarFramePNG]]]:
+    ) -> dict[BOMRadarLocation: dict[RADAR_TYPE: list[BOMRadarFramePNG]]]:
         """Download radar data for the given radar and time range.
 
         Args:
@@ -70,8 +78,10 @@ class BOMRadarDownload(BOMFTPPool):
             ignore_list: List of radar frames to ignore. Defaults to None which doesn't ignore any frames.
 
         Returns:
-            A dict :class:`BOMRadarFrameRaw` objects nested by :class:`BOMRadarLocationBase` and :class:`RADAR_TYPE`.
+            A dict :class:`BOMRadarFrameRaw` objects nested by :class:`BOMRadarLocation` and :class:`RADAR_TYPE`.
         """
+
+        logger.info("Starting radar download")
 
         # Recast radar_locations and radar_types as lists if they are not already
         if radar_locations and not isinstance(radar_locations, list):
@@ -80,10 +90,12 @@ class BOMRadarDownload(BOMFTPPool):
         if radar_types and not isinstance(radar_types, list):
             radar_types = [radar_types]
 
+        logger.info("Getting radar files")
         # Get all files, only need single connection
         with BOMFTPConn() as conn:
             radar_dir_files = conn.get_directory_contents(BOM_RADAR_PATH)
 
+        logger.info("Filtering radar files")
         # Filter PNG
         filtered_files = [x for x in radar_dir_files if x.endswith(".png")]
 
@@ -93,6 +105,7 @@ class BOMRadarDownload(BOMFTPPool):
         # Filter for correct length
         filtered_files = [x for x in filtered_files if len(x) == 25]
 
+        logger.info("Getting matching radar files")
         # Get matching files
         matching_filenames = self._get_matching_files(
             filtered_files,
@@ -108,15 +121,26 @@ class BOMRadarDownload(BOMFTPPool):
             BOMRadarPNGRemoteFile(x, BOM_RADAR_PATH) for x in matching_filenames
         ]
 
+        logger.info("Getting radar frames")
         frames: list = self._get_frames(matching_filenames)
 
-        breakpoint()
+        frame_dict = {}
+        for frame in frames:
+            try:
+                frame_dict \
+                    .setdefault(frame.radar_id, {}) \
+                    .setdefault(frame.radar_type, []).append(frame)
+            except Exception as e:
+                frame_dict.setdefault("UNKNOWN", [])
+                frame_dict["UNKNOWN"].append(frame)
 
-    @log(logger=logger)
+        return frame_dict
+
+    # @log(logger=logger)
     def _get_matching_files(
         self,
         png_list: list[str],
-        radar_locations: list[BOMRadarLocationBase] = None,
+        radar_locations: list[BOMRadarLocation] = None,
         radar_types: list[RADAR_TYPE] = None,
         start_time: datetime.datetime = None,
         end_time: datetime.datetime = None,
@@ -150,7 +174,7 @@ class BOMRadarDownload(BOMFTPPool):
 
         # Filter according to radar_type
         if radar_locations:
-            radar_locations_str = [x.base() for x in radar_locations]
+            radar_locations_str = [x.base for x in radar_locations]
             filtered_list = [
                 x for x in filtered_list if x["idr"] in radar_locations_str
             ]
@@ -184,15 +208,21 @@ class BOMRadarDownload(BOMFTPPool):
             conn = self.get_connection()
             remote_file = conn.get_file(remote_file)
             self.release_connection(conn)
+
+            self._progress["current"] += 1
+            logger.info(
+                f"Downloaded {self._progress['current']}/{self._progress['total']}")
             return BOMRadarFramePNG(remote_file, tz)
         except Exception as e:
-            print(e)
+            logger.exception(e)
             pass
 
         return None
 
     def _get_frames(self, remote_files: list[BOMRadarPNGRemoteFile]):
         results = []
+        self._progress["total"] = len(remote_files)
+
         with self as conn_pool:
             with ThreadPoolExecutor(max_workers=self._connections_count) as executor:
                 results = list(executor.map(self._get_frame, remote_files))
