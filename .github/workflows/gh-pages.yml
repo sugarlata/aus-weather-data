@@ -22,13 +22,22 @@ jobs:
     - name: Set up Python
       run: uv python install 3.9
 
-    - name: Install Project Dependencies
-      run: uv sync --all-extras --dev
+    - name: Generate Dev Requirements
+      run: uv pip freeze > dev-requirements.txt
+
+    - name: Cache Dependencies
+      uses: actions/cache@v2
+      with:
+        path: ${{ steps.pip-cache.outputs.dir }}
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/dev-requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
 
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
         checkout: false
         documentation_path: ./docs/source
+        requirements_path: ./dev-requirements.txt
         cache: true
         publish: true
