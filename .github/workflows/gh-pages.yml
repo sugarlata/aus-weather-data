@@ -25,14 +25,6 @@ jobs:
     - name: Generate Dev Requirements
       run: uv pip freeze > dev-requirements.txt
 
-    - name: Cache Dependencies
-      uses: actions/cache@v2
-      with:
-        path: ${{ steps.pip-cache.outputs.dir }}
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/dev-requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
