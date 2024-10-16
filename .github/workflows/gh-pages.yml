@@ -31,5 +31,4 @@ jobs:
         checkout: false
         documentation_path: ./docs/source
         requirements_path: ./dev-requirements.txt
-        cache: true
         publish: true
