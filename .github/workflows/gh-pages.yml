@@ -19,8 +19,8 @@ jobs:
       with:
         version: "0.4.22"
     
-    - name: Set up Python ${{matrix.python-version}}
-      run: uv python install ${{matrix.python-version}}
+    - name: Set up Python
+      run: uv python install 3.9
 
     - name: Install Project Dependencies
       run: uv sync --all-extras --dev
