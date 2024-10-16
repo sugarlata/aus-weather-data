@@ -1,9 +1,11 @@
 import os
 import sys
 
+from typing import List
+
 if True:
     sys.path.insert(0, os.path.abspath("../.."))
-    import aus_weather_data
+    import aus_weather_data  # noqa: F401
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -32,7 +34,7 @@ extensions = [
 todo_include_todos = True
 
 templates_path = ["_templates"]
-exclude_patterns = []
+exclude_patterns: List[str] = []
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output

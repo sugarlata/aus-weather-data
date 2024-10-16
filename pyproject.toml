@@ -1,0 +1,34 @@
+[project]
+name = "aus-weather-data"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.8.0"
+dependencies = [
+    "ftputil>=5.1.0",
+    "loguru>=0.7.2",
+    "numpy>=1.24.4",
+    "pytz>=2024.2",
+    "types-pytz>=2024.2.0.20241003",
+    "tzdata>=2024.2",
+]
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+modules = "aus_weather_data"
+exclude = ["tests/"]
+
+[tool.uv]
+dev-dependencies = [
+    "black>=24.8.0",
+    "esbonio>=0.16.5",
+    "furo>=2024.8.6",
+    "mypy>=1.12.0",
+    "pytest>=8.3.3",
+    "ruff",
+    "sphinx>=7.1.2",
+    "sphinx-autodoc-typehints>=2.0.1",
+    "setuptools>=75.1.0",
+]

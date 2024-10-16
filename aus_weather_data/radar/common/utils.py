@@ -49,11 +49,12 @@ def split_filename(filename: str) -> dict:
 
     filename_array = filename.split(".")
     if len(filename_array) != 4:
+        breakpoint()
         raise ValueError("Filename is not in the correct format.")
 
     idr = filename_array[0][:-1]
     idrType = filename_array[0][-1:]
-    idrIdType = filename_array[0]
+    base = filename_array[0]
     year = filename_array[2][0:4]
     month = filename_array[2][4:6]
     day = filename_array[2][6:8]
@@ -68,7 +69,7 @@ def split_filename(filename: str) -> dict:
         "filename": filename,
         "idr": idr,
         "idrType": idrType,
-        "idrIdType": idrIdType,
+        "base": base,
         "year": year,
         "month": month,
         "day": day,
@@ -77,3 +78,9 @@ def split_filename(filename: str) -> dict:
         "date": date,
         "dt": dt,
     }
+
+
+__all__ = [
+    "get_translation_coordinate",
+    "split_filename",
+]

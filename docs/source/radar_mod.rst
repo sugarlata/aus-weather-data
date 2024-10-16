@@ -5,24 +5,32 @@ Radar Module
 
 Radar Types
 -----------
-.. autoclass:: aus_weather_data.RADAR_TYPE
+.. autoclass:: RADAR_TYPE
    :members:
-
-Radar Location (Base)
----------------------
-.. autoclass:: aus_weather_data.radar.location.BOMRadarLocation
-   :members:
-   :inherited-members:
 
 Radar Location
 --------------
 .. autoclass:: BOMRadarLocation
    :members:
+   :inherited-members:
 
-Radar Frame Raw
+Radar Location Model
+--------------------
+.. autoclass:: BOMRadarLocationModel
+   :members:
+
+Radar Frame Metadata
+--------------------
+
+The Radar Frame Metadata object contains metadata of a radar frame based on the filename.
+
+.. autoclass:: BOMRadarFrameMetadata
+   :members:
+
+Radar Frame PNG
 ---------------
 
-The Radar Frame Raw object contains raw png data and metadata of a radar frame.
+The Radar Frame PNG object contains metadata of a radar frame based on the filename as well as PNG data.
 
-.. autoclass:: BOMRadarFrameRaw
+.. autoclass:: BOMRadarFramePNG
    :members:

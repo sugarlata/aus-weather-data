@@ -62,4 +62,6 @@ class RADAR_TYPE(Enum):
         return self.__str__()
 
 
-RADAR_TYPE_MAP: dict[str:RADAR_TYPE] = {x.value: x for x in RADAR_TYPE}
+__all__ = [
+    "RADAR_TYPE",
+]

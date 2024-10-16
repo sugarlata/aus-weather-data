@@ -1,40 +1,21 @@
 import ftplib
-import logging
 import threading
 
 from io import BytesIO
+from loguru import logger
+from typing import List
 
-from ..common.file_handling.remote import BOMRadarPNGRemoteFile
-from aus_weather_data.core.logger import (
-    log,
-    LOG_FORMAT,
-    GLOBAL_LOG_LEVEL,
-    GLOBAL_LOG_FILE,
-    GLOBAL_LOG_STREAM,
+from aus_weather_data.radar.common.frame import (
+    BOMRadarFrameMetadata,
+    BOMRadarFramePNG,
 )
 
-from aus_weather_data.radar.common.constants import (
+from aus_weather_data.constants import (
     BOM_FTP_HOST,
     BOM_FTP_USER,
     BOM_FTP_PASS,
+    BOM_RADAR_PATH,
 )
-
-# Log level for this file. Default pull from global values. Can override here.
-LOG_LEVEL = GLOBAL_LOG_LEVEL
-LOG_FILE = GLOBAL_LOG_FILE
-LOG_STREAM = GLOBAL_LOG_STREAM
-
-# Setup logging for this file
-logger = logging.getLogger(__name__)
-logger.setLevel(LOG_LEVEL)
-formatter = logging.Formatter(LOG_FORMAT)
-file_handler = logging.FileHandler(LOG_FILE)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-if LOG_STREAM:
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
 
 
 class BOMFTPConn(object):
@@ -85,16 +66,14 @@ class BOMFTPConn(object):
         Close the FTP connection
         """
 
-        try:
+        if self._keep_alive_thread:
             self._keep_alive_thread.cancel()
             self._keep_alive_thread = None
-        except Exception as e:
-            logger.exception(e)
 
         try:
             self._ftp_conn.quit()
             self._ftp_conn = None
-        except Exception as e:
+        except ftplib.all_errors as e:
             logger.exception(e)
             self._ftp_conn = None
 
@@ -105,10 +84,10 @@ class BOMFTPConn(object):
 
         try:
             self._ftp_conn.pwd()
-        except Exception as e:
+        except ftplib.all_errors as e:
             logger.exception(e)
 
-    def get_directory_contents(self, directory: str) -> list[str]:
+    def get_directory_contents(self, directory: str = BOM_RADAR_PATH) -> List[str]:
         """Get the contents of the given directory.
 
         Args:
@@ -120,28 +99,66 @@ class BOMFTPConn(object):
 
         try:
             return self._ftp_conn.nlst(directory)
-        except Exception as e:
+        except ftplib.all_errors as e:
             logger.exception(e)
             return []
 
-    def get_file(self, remote_file: BOMRadarPNGRemoteFile) -> BOMRadarPNGRemoteFile:
+    def get_file(self, remote_file: BOMRadarFrameMetadata) -> BOMRadarFramePNG:
         """Get the contents of the given file.
 
         Args:
             filename: The filename to get the contents of.
 
         Returns:
-            The contents of the given file.
+            The contents of the given file as bytes.
+
+        Raises:
+            IOError: If the file cannot be retrieved.
         """
 
         try:
             byte_stream = BytesIO()
             self._ftp_conn.retrbinary(
-                f"RETR {remote_file.full_path}", byte_stream.write
+                f"RETR {BOM_RADAR_PATH}/{remote_file.filename}", byte_stream.write
             )
-            remote_file.data = byte_stream.getvalue()
-            return remote_file
+            png_frame = BOMRadarFramePNG(
+                remote_file.filename,
+                locale_tz=remote_file.locale_tz,
+            )
 
-        except Exception as e:
+            png_frame.load_png_data(byte_stream.getvalue())
+            return png_frame
+
+        except ftplib.all_errors as e:
             logger.exception(e)
-            return None
+            raise IOError(f"Failed to get file {remote_file.filename} from FTP: {e}")
+
+    def get_files(
+        self, remote_files: List[BOMRadarFrameMetadata]
+    ) -> List[BOMRadarFramePNG]:
+        """Get the contents of the given files.
+
+        Args:
+            remote_files: The files to get the contents of.
+
+        Returns:
+            The contents of the given files as a list of bytes.
+
+        Raises:
+            IOError: If the files cannot be retrieved.
+        """
+
+        frames = []
+
+        for remote_file in remote_files:
+            try:
+                frames.append(self.get_file(remote_file))
+            except IOError as e:
+                logger.exception(e)
+
+        return frames
+
+
+__all__ = [
+    "BOMFTPConn",
+]

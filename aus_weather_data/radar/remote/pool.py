@@ -1,30 +1,7 @@
-import logging
+from loguru import logger
+from typing import List
 
 from aus_weather_data.radar.remote.conn import BOMFTPConn
-from aus_weather_data.core.logger import (
-    log,
-    LOG_FORMAT,
-    GLOBAL_LOG_LEVEL,
-    GLOBAL_LOG_FILE,
-    GLOBAL_LOG_STREAM,
-)
-
-# Log level for this file. Default pull from global values. Can override here.
-LOG_LEVEL = GLOBAL_LOG_LEVEL
-LOG_FILE = GLOBAL_LOG_FILE
-LOG_STREAM = GLOBAL_LOG_STREAM
-
-# Setup logging for this file
-logger = logging.getLogger(__name__)
-logger.setLevel(LOG_LEVEL)
-formatter = logging.Formatter(LOG_FORMAT)
-file_handler = logging.FileHandler(LOG_FILE)
-file_handler.setFormatter(formatter)
-logger.addHandler(file_handler)
-if LOG_STREAM:
-    stream_handler = logging.StreamHandler()
-    stream_handler.setFormatter(formatter)
-    logger.addHandler(stream_handler)
 
 
 class BOMFTPPool(object):
@@ -32,9 +9,9 @@ class BOMFTPPool(object):
     Pooling for FTP Connections
     """
 
-    _all_connections: list[BOMFTPConn] = []
-    _available_connections: list[BOMFTPConn] = []
-    _used_connections: list[BOMFTPConn] = []
+    _all_connections: List[BOMFTPConn] = []
+    _available_connections: List[BOMFTPConn] = []
+    _used_connections: List[BOMFTPConn] = []
 
     def __init__(self, connections: int = 10):
         """
@@ -120,3 +97,8 @@ class BOMFTPPool(object):
         Close an individual connection
         """
         conn.quit()
+
+
+__all__ = [
+    "BOMFTPPool",
+]

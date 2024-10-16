@@ -41,3 +41,6 @@ See the Jupyter notebooks in [examples](https://github.com/sugarlata/aus_weather
 
 [![Bureau Of Meteorology Attribute](assets/bom_attr.png)](https://reg.bom.gov.au/)
 
+
+Notes: https://jonathanadly.com/open-sourcing-a-python-project-the-right-way-in-2024
+https://www.reddit.com/r/Python/comments/1cc9wtr/what_are_your_favourite_precommit_hooks_and_why/

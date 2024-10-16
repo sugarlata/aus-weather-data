@@ -38,8 +38,10 @@
 
 ```mermaid
 
+
 classDiagram
 
+direction RL
 BOMRadarPNGLocalFile <|-- BOMRadarFile
 BOMRadarPNGRemoteFile <|-- BOMRadarFile
 BOMRadarFramePNG <|-- BOMRadarFrameBase
@@ -47,30 +49,59 @@ BOMRadarLocation <|-- Enum
 RADAR_TYPE <|-- Enum
 BOMRadarDownload <|-- BOMFTPPool
 
-class BOMRadarFile {
-    +|str| filename
-    +|str| path
-    +|bytes| data
+class BOMRadarFile{
+    +str filename
+    +str path
+    +bytes data
 }
 
-class BOMRadarPNGLocalFile{
-    +full_path(str)
+class BOMRadarPNGLocalFile~BOMRadarFile~{
+    +full_path() str
+    +load_data_from_file() bytes
+    +save_file()
 }
 
-class BOMRadarPNGLocalFile {
-    +holder
-}
-
-class BOMRadarPNGRemoteFile {
-    +holder
+class BOMRadarPNGRemoteFile~BOMRadarFile~{
+    +full_path() str
 }
 
 class BOMRadarFrameBase {
-    +holder
+    +pytz.BaseTzInfo tz
+    +datetime.datetime start_time
+    +datetime.datetime end_time
+    ~__init__(str filename, pytz.BaseTzInfo tz)
+    ~__str__() str
+    ~__repr__() str
+    +str radar_id_str
+    +BomRadarLocation radar_id
+    +str radar_type_str
+    +RADAR_TYPE radar_type
+    +str radar_id_type_str
+    +float epoch_time
+    +datetime.datetime dt_utc
+    +datetime.datetime dt_locale
+    +str year_utc
+    +str year_locale
+    +str month_utc
+    +str month_locale
+    +str day_utc
+    +str day_locale
+    +str hour_utc
+    +str hour_locale
+    +str minute_utc
+    +str minute_locale
+    +str date_utc
+    +str date_locale
+    +str nice_date_utc
+    +str nice_date_locale
+    +str filename
+
+
 }
 
-class BOMRadarFramePNG {
-    +holder
+class BOMRadarFramePNG~BOMRadarFrameBase~{
+    -str _filename
+    -dict _metadata
 }
 
 class BOMRadarLocation {
@@ -103,37 +134,57 @@ class BOMRadarDownload {
 
 #### BOMRadarDownload
 
+- Holder
+
 ## radar.common
 
 ### constants.py
 
 #### Credential Constants
 
+- Holder
+
 #### IDRXX_DATA
+
+- Holder
 
 ### frame_base.py
 
 #### BOMRadarFrameBase
 
+- Holder
+
 ### frame_png.py
 
 #### BOMRadarFramePNG
+
+- Holder
 
 ### location.py
 
 #### BOMRadarLocation
 
+- Holder
+
 ### types.py
 
 #### RADAR_TYPE
 
+- Holder
+
 #### RADAR_TYPE_MAP
+
+- Holder
 
 ### utils.py
 
 #### get_translation_coordinate
 
+- Holder
+
 #### split_filename
+
+- Holder
 
 ## radar.common.file_handling
 
@@ -141,13 +192,19 @@ class BOMRadarDownload {
 
 #### BOMRadarFile
 
+- Holder
+
 ### local.py
 
 #### BOMRadarPNGLocalFile
 
+- Holder
+
 ### remote.py
 
 #### BOMRadarPNGRemoteFile
+
+- Holder
 
 ## radar.remote
 
@@ -155,6 +212,10 @@ class BOMRadarDownload {
 
 #### BOMFTPConn
 
+- Holder
+
 ### pool.py
 
 #### BOMFTPPool
+
+- Holder

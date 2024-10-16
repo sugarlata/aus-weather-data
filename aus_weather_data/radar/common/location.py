@@ -1,69 +1,43 @@
-from enum import Enum
-from typing import List, Set
-from .utils import get_translation_coordinate
-from .types import RADAR_TYPE
-from .constants import (
-    IDR02_DATA,
-    IDR49_DATA,
-    IDR68_DATA,
-    IDR95_DATA,
-    IDR97_DATA,
-    IDR55_DATA,
-    IDR71_DATA,
-    IDR03_DATA,
-    IDR96_DATA,
-    IDR40_DATA,
-    IDR94_DATA,
-    IDR64_DATA,
-    IDR46_DATA,
-    IDR33_DATA
-)
+from typing import Set, Tuple, List
+from aus_weather_data.radar.common.utils import get_translation_coordinate
+from aus_weather_data.radar.common.types import RADAR_TYPE
+from aus_weather_data.radar.common.idr_data import IDR_DATA
 
 
-class BOMRadarLocation(Enum):
+class BOMRadarLocationModel(object):
     """
-    Base Class for Radar Locations
+    Base Class for Radar Location Data
 
-    This forms the base class for all radar location classes.
+    This is a middleware class that captures the data for a radar location.
 
-    This class should not be directly called. Instead use a
-    nested class of :class:`aus_weather_data.radar.location.BOMRadarLocation`.
-    See BOMRadarLocation documentation for more details.
-
-    Attributes:
-        _base_radar_types: Contains a list of the base radar types for all locations
     """
 
-    IDR02 = IDR02_DATA
-    IDR49 = IDR49_DATA
-    IDR68 = IDR68_DATA
-    IDR95 = IDR95_DATA
-    IDR97 = IDR97_DATA
-    IDR55 = IDR55_DATA
-    IDR71 = IDR71_DATA
-    IDR03 = IDR03_DATA
-    IDR96 = IDR96_DATA
-    IDR40 = IDR40_DATA
-    IDR94 = IDR94_DATA
-    IDR64 = IDR64_DATA
-    IDR46 = IDR46_DATA
-    IDR33 = IDR33_DATA
+    def __init__(
+        self,
+        doc: str,
+        base: str,
+        location_name: str,
+        latitude: float,
+        longitude: float,
+        radar_types: List[str],
+    ):
+        """Initialise the Radar Location Model
 
-    def __init__(self, doc, location_name, latitude, longitude, extra_radar_types=None):
+        Args:
+            doc (str): Documentation for the radar location.
+            base (str): Base of the radar (IDR02 for example).
+            location_name (str): Name of the radar.
+            latitude (float): Latitude of the radar.
+            longitude (float): Longitude of the radar.
+            radar_types (list[str]): List of radar types for this radar.
+
+        """
         self.__doc__ = doc
+        self._base = base
         self._location_name = location_name
         self._latitude = latitude
         self._longitude = longitude
-
-        if extra_radar_types:
-            self._radar_types = {
-                *{
-                    RADAR_TYPE.REF_512_KM,
-                    RADAR_TYPE.REF_256_KM,
-                    RADAR_TYPE.REF_128_KM,
-                },
-                *extra_radar_types
-            }
+        self._radar_types = {RADAR_TYPE(radar_type) for radar_type in radar_types}
 
     def __repr__(self) -> str:
         return self.__str__()
@@ -72,11 +46,12 @@ class BOMRadarLocation(Enum):
         return f"BOMRadarLocation<{self.base}: {self.location_name}>"
 
     @property
-    def location(self) -> tuple:
-        """Get the location (latitude and longitude) of the radar.
+    def location(self) -> Tuple[float, float]:
+        """
+        Get the location (latitude and longitude) of the radar.
 
         Returns:
-            Location of the radar
+            (tuple[float, float]): Latitude and Longitude of the radar.
         """
 
         return (self._latitude, self._longitude)
@@ -87,20 +62,20 @@ class BOMRadarLocation(Enum):
         Get the name of the radar.
 
         Returns:
-            Name of the radar
+            (str): Name of the radar.
         """
 
         return self._location_name
 
     @property
-    def base(self):
+    def base(self) -> str:
         """
         Get the base of the radar.
 
         Returns:
-            Radar Base
+            (str): Radar Base
         """
-        return self.name
+        return self._base
 
     @property
     def radar_types(self) -> Set[RADAR_TYPE]:
@@ -113,7 +88,7 @@ class BOMRadarLocation(Enum):
 
         return self._radar_types
 
-    def radar_range(self, radar_type: RADAR_TYPE) -> tuple:
+    def radar_range(self, radar_type: RADAR_TYPE) -> Tuple[tuple, tuple, tuple, tuple]:
         """
         Get the radar bounding box for a specific radar type
 
@@ -129,10 +104,10 @@ class BOMRadarLocation(Enum):
         Each entry is a tuple of form (lat, lon)
 
         Args:
-            radar_type: The radar type requested for this bounding box.
+            radar_type (RADAR_TYPE): The radar type to get the range for.
 
         Returns:
-            Four bounding corners of the range. Each corner is a tuple -> (lat, lon)
+            (tuple) Four bounding corners of the range. Each corner is a tuple -> (lat, lon)
 
         Raises:
             TypeError: If the radar type is not of type :class:`RADAR_TYPE`
@@ -142,7 +117,7 @@ class BOMRadarLocation(Enum):
             raise TypeError("radar_type should be a RADAR_TYPE")
 
         if radar_type not in self._radar_types:
-            raise TypeError(f"There is no {radar_type} for {self._name}")
+            raise TypeError(f"There is no {radar_type} for {self._location_name}")
 
         if "64_KM" in radar_type.name:
             distance = 64
@@ -173,271 +148,41 @@ class BOMRadarLocation(Enum):
             (south_lat, west_lon),
         )
 
-#     class IDR68(BOMRadarLocationBase):
-#         """
-#         IDR for Bairnsdale
 
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
+class BOMRadarLocation:
+    """Bureau of Meteorology Radar Locations
 
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
+    This class contains the radar locations for the Bureau of Meteorology
+    radar stations. Each radar station has a specific set of radar types
+    that can be accessed.
 
-#         _name = "Bairnsdale"
-#         _latitude = -37.89
-#         _longitude = 147.56
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.VEL_128_KM,
-#         }
+    Use `IDR_LIST` for a list of all radar locations.
 
-#     class IDR95(BOMRadarLocationBase):
-#         """
-#         IDR for Rainbow
+    """
 
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
+    IDR02: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR02"])
+    IDR49: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR49"])
+    IDR68: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR68"])
+    IDR95: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR95"])
+    IDR97: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR97"])
+    IDR55: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR55"])
+    IDR71: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR71"])
+    IDR03: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR03"])
+    IDR96: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR96"])
+    IDR40: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR40"])
+    IDR94: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR94"])
+    IDR64: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR64"])
+    IDR46: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR46"])
+    IDR33: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR33"])
+    IDR66: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR66"])
+    IDR50: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR50"])
+    IDR108: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR108"])
+    IDR08: BOMRadarLocationModel = BOMRadarLocationModel(**IDR_DATA["IDR08"])
 
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Rainbow"
-#         _latitude = -35.99
-#         _longitude = 142.01
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR97(BOMRadarLocationBase):
-#         """
-#         IDR for Mildura
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Mildura"
-#         _latitude = -34.28
-#         _longitude = 141.59
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR55(BOMRadarLocationBase):
-#         """
-#         IDR for Wagga Wagga
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Wagga Wagga"
-#         _latitude = -35.17
-#         _longitude = 147.47
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types}
-
-#     class IDR71(BOMRadarLocationBase):
-#         """
-#         IDR for Sydney
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Sydney"
-#         _latitude = -33.701
-#         _longitude = 151.21
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR03(BOMRadarLocationBase):
-#         """
-#         IDR for Wollongong
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Wollongong"
-#         _latitude = -34.264
-#         _longitude = 150.874
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR96(BOMRadarLocationBase):
-#         """
-#         IDR for Yeoval
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Yeoval"
-#         _latitude = -32.74
-#         _longitude = 148.7
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR40(BOMRadarLocationBase):
-#         """
-#         IDR for Canberra
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Canberra"
-#         _latitude = -35.66
-#         _longitude = 149.51
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR94(BOMRadarLocationBase):
-#         """
-#         IDR for Hillston
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Hillston"
-#         _latitude = -33.55
-#         _longitude = 145.52
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR64(BOMRadarLocationBase):
-#         """
-#         IDR for Adelaide (Buckland Park)
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Adelaide (Buckland Park)"
-#         _latitude = -34.617
-#         _longitude = 138.469
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR46(BOMRadarLocationBase):
-#         """
-#         IDR for Adelaide (Sellicks Hill)
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Adelaide (Sellicks Hill)"
-#         _latitude = -35.33
-#         _longitude = 138.5
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
-
-#     class IDR33(BOMRadarLocationBase):
-#         """
-#         IDR for Ceduna
-
-#         See :class:`aus_weather_data.radar.location.BOMRadarLocationBase` for inherited methods.
-
-#         Attributes:
-#             radar_types: Contains a list of the radar types that this location supports.
-#         """
-
-#         _name = "Ceduna"
-#         _latitude = -32.13
-#         _longitude = 133.7
-#         radar_types: Set[RADAR_TYPE] = {
-#             *BOMRadarLocationBase._base_radar_types,
-#             RADAR_TYPE.REF_64_KM,
-#             RADAR_TYPE.VEL_128_KM,
-#             RADAR_TYPE.RAI_128_KM_1H,
-#             RADAR_TYPE.RAI_128_KM_24H,
-#             RADAR_TYPE.RAI_128_KM_5M,
-#             RADAR_TYPE.RAI_128_KM_9AM,
-#         }
+    IDR_LIST = list(IDR_DATA.keys())
 
 
-RADAR_LOCATION_MAP: dict[str, BOMRadarLocation] = {
-    k: v
-    for k, v in BOMRadarLocation.__dict__.items()
-    if 'IDR' in k
-}
+__all__ = [
+    "BOMRadarLocation",
+    "BOMRadarLocationModel",
+]

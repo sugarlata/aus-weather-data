@@ -2,7 +2,6 @@ name: Main Tests
 
 on:
   push:
-    branches: [main]
 
 permissions:
   contents: read
@@ -12,19 +11,26 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11"]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v3
+        with:
+          version: "0.4.22"
+      
       - name: Set up Python ${{matrix.python-version}}
-        uses: actions/setup-python@v4
-        with: 
-          python-version: ${{matrix.python-version}}
-          cache: 'pip'
-      - name: Install Pipenv
-        run: pip install pipenv
-      - name: Install Dependencies
-        run: pipenv install --dev
+        run: uv python install ${{matrix.python-version}}
+
+      - name: Install Project Dependencies
+        run: uv sync --all-extras --dev
+
       - name: Run Python Tests
-        run: pipenv run pytest
+        run: uv run pytest
+
       - name: Run Python Type Checking
-        run: pipenv run mypy aus_weather_data
+        run: uv run mypy aus_weather_data
+
+      - name: Run Python Linting
+        run: uv run ruff check

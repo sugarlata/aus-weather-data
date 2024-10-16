@@ -1,71 +1,42 @@
 import os
 import pytz
-import base64
 import datetime
+import tempfile
 
-from aus_weather_data import BOMRadarFramePNG, BOMRadarPNGLocalFile, RADAR_TYPE, BOMRadarLocation
+from aus_weather_data.radar.common.frame import BOMRadarFramePNG
+from aus_weather_data.radar.common.location import BOMRadarLocation
+from aus_weather_data.radar.common.types import RADAR_TYPE
 
-# TODO Need to add in a test case here for difference between UTC year and locale year.
 
-
-def test_file_load():
+def test_file_load_and_save():
     filename_base = "IDR024.T.202001312324"
     path = os.path.join(*[".", "tests", "assets"])
 
-    local_file = BOMRadarPNGLocalFile(f"{filename_base}.png", path)
+    frame = BOMRadarFramePNG(f"{filename_base}.png")
+    frame.load_png_from_file(path)
 
-    local_file.load_data_from_file()
+    tmp = tempfile.TemporaryDirectory()
 
-    frame = BOMRadarFramePNG(local_file)
+    frame.save_png_to_file(tmp.name)
 
-    with open(os.path.join(*[path, f"{filename_base}.b64"])) as f:
-        b64_data = f.read()
-        assert frame.data == base64.b64decode(b64_data)
-
-
-def test_file_save():
-    filename_base = "IDR024.T.202001312324"
-
-    path = os.path.join(*[".", "tests", "assets"])
-
-    local_file = BOMRadarPNGLocalFile(f"{filename_base}.png", path)
-
-    local_file.load_data_from_file()
-
-    frame = BOMRadarFramePNG(local_file)
-
-    local_file_output = frame.get_local_file(os.path.join(*[path, "temp"]))
-
-    local_file_output.save_file()
-
-    with open(os.path.join(*[path, "temp", f"{filename_base}.png"]), "rb") as f:
+    with open(os.path.join(*[tmp.name, f"{filename_base}.png"]), "rb") as f:
         hex_data = f.read()
-        assert frame.data == hex_data
+        assert frame._png_data == hex_data
 
-    # Cleanup
-    try:
-        os.remove(os.path.join(*[path, "temp", f"{filename_base}.png"]))
-    except Exception:
-        pass
+    tmp.cleanup()
+
+
 
 
 def test_radar_metadata():
     filename_base = "IDR024.T.202001312324"
-
-    path = os.path.join(*[".", "tests", "assets"])
-
-    local_file = BOMRadarPNGLocalFile(f"{filename_base}.png", path)
-
-    local_file.load_data_from_file()
-
-    frame = BOMRadarFramePNG(local_file)
-
     timezone = pytz.timezone("Australia/Melbourne")
-    frame.tz = timezone
+    frame = BOMRadarFramePNG(f"{filename_base}.png", timezone)
+
 
     assert frame.radar_id_str == "IDR02"
     assert frame.radar_type_str == "4"
-    assert frame.radar_id_type_str == "IDR024"
+    assert frame.radar_base_str == "IDR024"
 
     assert frame.radar_id == BOMRadarLocation.IDR02
     assert frame.radar_type == RADAR_TYPE.REF_64_KM
