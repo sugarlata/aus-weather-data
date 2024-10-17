@@ -17,9 +17,6 @@ dependencies = [
 requires = ["setuptools>=75.2.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.package-data]
-"aus_weather_data" = ["py.typed"]
-
 [tool.setuptools.packages]
 find = {}
 
