@@ -1,3 +1,4 @@
+import time
 import datetime
 
 from typing import Optional, List, Dict
@@ -56,7 +57,14 @@ class BOMRadarDownload(BOMFTPPool):
 
         logger.info("Getting radar files")
         # Get all files, only need single connection
-        conn = self.get_connection()
+        conn = None
+        while conn is None:
+            try:
+                conn = self.get_connection()
+            except Exception:
+                logger.error("Failed to get connection. Sleeping for 2 seconds.")
+                time.sleep(2)
+
         radar_dir_files = conn.get_directory_contents()
         self.release_connection(conn)
 
@@ -88,7 +96,14 @@ class BOMRadarDownload(BOMFTPPool):
     ) -> BOMRadarFramePNG:
         """Download a radar frame"""
 
-        conn = self.get_connection()
+        conn = None
+        while conn is None:
+            try:
+                conn = self.get_connection()
+            except Exception:
+                logger.error("Failed to get connection. Sleeping for 2 seconds.")
+                time.sleep(2)
+
         frame = conn.get_file(remote_file)
         self.release_connection(conn)
 
@@ -101,11 +116,11 @@ class BOMRadarDownload(BOMFTPPool):
         self, remote_files: List[BOMRadarFrameMetadata]
     ) -> List[BOMRadarFramePNG]:
         results = []
+        self._progress["current"] = 0
         self._progress["total"] = len(remote_files)
 
-        with self:
-            with ThreadPoolExecutor(max_workers=self._connections_count) as executor:
-                results = list(executor.map(self._get_frame, remote_files))
+        with ThreadPoolExecutor(max_workers=self._connections_count) as executor:
+            results = list(executor.map(self._get_frame, remote_files))
 
         return results
 
