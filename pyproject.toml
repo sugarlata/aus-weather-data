@@ -17,9 +17,8 @@ dependencies = [
 requires = ["setuptools>=75.2.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["aus_weather_data"]
+[tool.setuptools.packages]
+find = {}
 
 [tool.mypy]
 python_version = "3.8"
