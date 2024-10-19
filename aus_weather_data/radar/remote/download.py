@@ -46,7 +46,7 @@ class BOMRadarDownload(BOMFTPPool):
             A dict :class:`BOMRadarFrameRaw` objects nested by :class:`BOMRadarLocation` and :class:`RADAR_TYPE`.
         """
 
-        logger.info("Starting radar download")
+        logger.debug("Starting radar download")
 
         # Recast radar_locations and radar_types as lists if they are not already
         if radar_locations and not isinstance(radar_locations, list):
@@ -55,7 +55,6 @@ class BOMRadarDownload(BOMFTPPool):
         if radar_types and not isinstance(radar_types, list):
             radar_types = [radar_types]
 
-        logger.info("Getting radar files")
         # Get all files, only need single connection
         conn = None
         while conn is None:
@@ -68,7 +67,6 @@ class BOMRadarDownload(BOMFTPPool):
         radar_dir_files = conn.get_directory_contents()
         self.release_connection(conn)
 
-        logger.info("Getting matching radar files")
         # Get matching files
         matching_filenames = get_matching_files(
             radar_dir_files,
@@ -108,7 +106,9 @@ class BOMRadarDownload(BOMFTPPool):
         self.release_connection(conn)
 
         self._progress["current"] += 1
-        logger.info(f"Downloaded {self._progress['current']}/{self._progress['total']}")
+        logger.debug(
+            f"Downloaded {self._progress['current']}/{self._progress['total']}"
+        )
 
         return frame
 

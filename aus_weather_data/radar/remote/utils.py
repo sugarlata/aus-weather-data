@@ -41,7 +41,7 @@ def get_matching_files(
         A list of matching filenames.
     """
 
-    logger.info("Filtering radar files")
+    logger.debug("Filtering radar files")
 
     # Filter PNG
     filtered_files = [x for x in file_list if x.endswith(".png")]
