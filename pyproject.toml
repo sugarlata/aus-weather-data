@@ -8,7 +8,10 @@ dependencies = [
     "ftputil>=5.1.0",
     "loguru>=0.7.2",
     "numpy>=1.24.4",
+    "pypng>=0.20220715.0",
     "pytz>=2024.2",
+    "scikit-image>=0.21.0",
+    "scipy>=1.10.1",
     "types-pytz>=2024.2.0.20241003",
     "tzdata>=2024.2",
 ]
@@ -26,6 +29,7 @@ warn_return_any = true
 warn_unused_configs = true
 modules = "aus_weather_data"
 exclude = ["tests/"]
+plugins = "numpy.typing.mypy_plugin"
 
 [tool.uv]
 dev-dependencies = [
