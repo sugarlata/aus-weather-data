@@ -41,10 +41,19 @@ def get_matching_files(
         A list of matching filenames.
     """
 
-    logger.info("Filtering radar files")
+    logger.debug("Filtering radar files")
 
     # Filter PNG
     filtered_files = [x for x in file_list if x.endswith(".png")]
+
+    # Filter Base First
+    if radar_locations:
+        radar_locations_str = [x.base for x in radar_locations]
+        filtered_files = [x for x in filtered_files if x[:5] in radar_locations_str]
+
+    if radar_types:
+        radar_types_str = [x.value for x in radar_types]
+        filtered_files = [x for x in filtered_files if x[5:6] in radar_types_str]
 
     # Get basename
     filtered_files = [os.path.basename(x) for x in filtered_files]

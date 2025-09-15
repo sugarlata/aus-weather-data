@@ -1,3 +1,4 @@
+import time
 import datetime
 
 from typing import Optional, List, Dict
@@ -45,7 +46,7 @@ class BOMRadarDownload(BOMFTPPool):
             A dict :class:`BOMRadarFrameRaw` objects nested by :class:`BOMRadarLocation` and :class:`RADAR_TYPE`.
         """
 
-        logger.info("Starting radar download")
+        logger.debug("Starting radar download")
 
         # Recast radar_locations and radar_types as lists if they are not already
         if radar_locations and not isinstance(radar_locations, list):
@@ -54,13 +55,18 @@ class BOMRadarDownload(BOMFTPPool):
         if radar_types and not isinstance(radar_types, list):
             radar_types = [radar_types]
 
-        logger.info("Getting radar files")
         # Get all files, only need single connection
-        conn = self.get_connection()
+        conn = None
+        while conn is None:
+            try:
+                conn = self.get_connection()
+            except Exception:
+                logger.error("Failed to get connection. Sleeping for 2 seconds.")
+                time.sleep(2)
+
         radar_dir_files = conn.get_directory_contents()
         self.release_connection(conn)
 
-        logger.info("Getting matching radar files")
         # Get matching files
         matching_filenames = get_matching_files(
             radar_dir_files,
@@ -88,12 +94,21 @@ class BOMRadarDownload(BOMFTPPool):
     ) -> BOMRadarFramePNG:
         """Download a radar frame"""
 
-        conn = self.get_connection()
+        conn = None
+        while conn is None:
+            try:
+                conn = self.get_connection()
+            except Exception:
+                logger.error("Failed to get connection. Sleeping for 2 seconds.")
+                time.sleep(2)
+
         frame = conn.get_file(remote_file)
         self.release_connection(conn)
 
         self._progress["current"] += 1
-        logger.info(f"Downloaded {self._progress['current']}/{self._progress['total']}")
+        logger.debug(
+            f"Downloaded {self._progress['current']}/{self._progress['total']}"
+        )
 
         return frame
 
@@ -101,11 +116,11 @@ class BOMRadarDownload(BOMFTPPool):
         self, remote_files: List[BOMRadarFrameMetadata]
     ) -> List[BOMRadarFramePNG]:
         results = []
+        self._progress["current"] = 0
         self._progress["total"] = len(remote_files)
 
-        with self:
-            with ThreadPoolExecutor(max_workers=self._connections_count) as executor:
-                results = list(executor.map(self._get_frame, remote_files))
+        with ThreadPoolExecutor(max_workers=self._connections_count) as executor:
+            results = list(executor.map(self._get_frame, remote_files))
 
         return results
 

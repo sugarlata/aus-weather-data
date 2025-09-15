@@ -98,7 +98,7 @@ class BOMFTPConn(object):
         """
 
         try:
-            return self._ftp_conn.nlst(directory)
+            return [f.split("/")[-1] for f in self._ftp_conn.nlst(directory)]
         except ftplib.all_errors as e:
             logger.exception(e)
             return []
