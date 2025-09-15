@@ -3,11 +3,11 @@ name = "aus-weather-data"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 dependencies = [
     "ftputil>=5.1.0",
     "loguru>=0.7.2",
-    "numpy>=1.24.4",
+    "numpy>1.24.4",
     "pytz>=2024.2",
     "types-pytz>=2024.2.0.20241003",
     "tzdata>=2024.2",
@@ -21,7 +21,7 @@ build-backend = "setuptools.build_meta"
 find = {}
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 modules = "aus_weather_data"
