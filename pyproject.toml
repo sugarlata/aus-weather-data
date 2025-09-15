@@ -8,6 +8,7 @@ dependencies = [
     "ftputil>=5.1.0",
     "loguru>=0.7.2",
     "numpy>=1.24.4",
+    "opencv-python>=4.8.1.78",
     "pypng>=0.20220715.0",
     "pytz>=2024.2",
     "scikit-image>=0.21.0",

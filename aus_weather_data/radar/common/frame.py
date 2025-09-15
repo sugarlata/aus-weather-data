@@ -1,9 +1,12 @@
 import os
 import pytz
+import zlib
+import pickle
 import datetime
 
 from typing import Optional, Union
 
+from aus_weather_data.models import IntensityArrays, DiscreteCells
 from aus_weather_data.radar.common.utils import split_filename
 from aus_weather_data.radar.common.location import (
     BOMRadarLocation,
@@ -11,10 +14,15 @@ from aus_weather_data.radar.common.location import (
 )
 from aus_weather_data.radar.common.types import RADAR_TYPE
 from aus_weather_data.exceptions import ParseFrameError
+from aus_weather_data.radar.common.analysis_funcs import (
+    get_intensity_arrays,
+    get_discrete_cells,
+)
 
 
-class __BOMRadarFrameBase(object):
-    """Radar Frame object for data from BOM.
+class BOMRadarFrameBase(object):
+    """
+    Radar Frame object for data from BOM.
 
     This is a base class to hold metadata related to a radar frame. See
     documentation for the functions in this class.
@@ -30,31 +38,30 @@ class __BOMRadarFrameBase(object):
 
     Attributes:
         locale_tz: Timezone for locale functions.
-        start_time: Start time of the frame. Auto populates from the date time extracted from the filename.
-        end_time: End time of the frame - generally start_time of the next frame in a sequence.
+
     """
 
     locale_tz: Optional[pytz.BaseTzInfo]
-    start_time: datetime.datetime
-    end_time: datetime.datetime
 
     def __init__(
         self,
         filename: str,
         locale_tz: Optional[pytz.BaseTzInfo] = None,
     ):
-        """Initialize the BOMRadarFrameBase class
+        """
+        Initialize the BOMRadarFrameBase class
 
         This will create a RadarFrameBase object.
 
         Args:
-            data: Either :class:`LocalBOMRadarFile` or :class:`RemoteBOMRadarFile` to load.
-            locale_tz (optional): :class:`pytz.timezone` object passed for localizing datetime object.
+            filename: Filename of the radar frame from BOM. E.G: IDR024.T.202001312236.png
+            locale_tz: Timezone for locale functions.
+
         """
 
-        self._filename: str = filename
+        self._filename: str = os.path.basename(filename)
+        self._frame_id: str = os.path.splitext(self._filename)[0]
         self._metadata: dict = split_filename(self._filename)
-        self.start_time = self._metadata["dt"]
         self.locale_tz = locale_tz
 
         try:
@@ -213,9 +220,16 @@ class __BOMRadarFrameBase(object):
 
         return self._filename
 
+    @property
+    def frame_id(self) -> str:
+        """ID of the frame"""
 
-class BOMRadarFrameMetadata(__BOMRadarFrameBase):
-    """Radar Frame object for data from BOM.
+        return self._frame_id
+
+
+class BOMRadarFrameMetadata(BOMRadarFrameBase):
+    """
+    Radar Frame object for data from BOM.
 
     This is a class to hold metadata related to a radar frame. See
     documentation for the functions in this class.
@@ -227,8 +241,9 @@ class BOMRadarFrameMetadata(__BOMRadarFrameBase):
     pass
 
 
-class BOMRadarFramePNG(__BOMRadarFrameBase):
-    """Radar Frame object for data from BOM.
+class BOMRadarFramePNG(BOMRadarFrameBase):
+    """
+    Radar Frame object for data from BOM.
 
     This is a class to hold metadata and radar data. See
     documentation for the functions in this class.
@@ -238,6 +253,8 @@ class BOMRadarFramePNG(__BOMRadarFrameBase):
     """
 
     _png_data: Union[bytes, None]
+    intensity_arrays: Optional[IntensityArrays] = None
+    discrete_cells: Optional[DiscreteCells] = None
 
     def load_png_data(self, data: bytes):
         """Load PNG data from a byte string
@@ -249,7 +266,7 @@ class BOMRadarFramePNG(__BOMRadarFrameBase):
 
         self._png_data = data
 
-    def load_png_from_file(self, path: str):
+    def load_png_from_file(self, file_location: str):
         """Load PNG data from a file
 
         Args:
@@ -257,7 +274,8 @@ class BOMRadarFramePNG(__BOMRadarFrameBase):
 
         """
 
-        with open(os.path.join(path, self.filename), "rb") as f:
+        with open(os.path.join(file_location, self.filename), "rb") as f:
+            # Need to change this from getting a buffered reader to bytes
             self._png_data = f.read()
 
     def save_png_to_file(self, path: str):
@@ -286,24 +304,53 @@ class BOMRadarFramePNG(__BOMRadarFrameBase):
             raise ValueError("self._png_data is None")
         return self._png_data
 
+    def analyze(self):
+        """Analyse the PNG data
 
-class BOMRadarFrameData(BOMRadarFramePNG):
-    """Radar Frame object for data from BOM.
+        Returns:
+            (object): Analysis object
 
-    This is a class to hold metadata and radar data in a binary format.
-    See documentation for the functions in this class.
+        """
 
-    It extends :class:`BOMRadarFramePNG`.
+        self.intensity_arrays = get_intensity_arrays(
+            self.frame_id,
+            self.png_data,
+        )
 
-    (Current wip)
+        self.discrete_cells = get_discrete_cells(
+            self.frame_id,
+            self.intensity_arrays.frames,
+            self.intensity_arrays.labels,
+        )
 
-    """
+    @property
+    def serialized_analysis_data(self) -> bytes:
+        if self.intensity_arrays is None or self.discrete_cells is None:
+            self.analyze()
 
-    pass
+        data_to_serialize = {
+            "filename": self.filename,
+            "frame_id": self.frame_id,
+            "intensity_arrays": zlib.compress(pickle.dumps(self.intensity_arrays)),
+            "discrete_cells": zlib.compress(pickle.dumps(self.discrete_cells)),
+        }
+
+        return pickle.dumps(data_to_serialize)
+
+    def save_analysis_data(self, path: str) -> None:
+        """Save analysis data to a file
+
+        Args:
+            path: Path to save the file
+
+        """
+
+        with open(os.path.join(path, f"{self.frame_id}.bra"), "wb") as f:
+            f.write(self.serialized_analysis_data)
 
 
 __all__ = [
+    "BOMRadarFrameBase",
     "BOMRadarFrameMetadata",
     "BOMRadarFramePNG",
-    "BOMRadarFrameData",
 ]

@@ -1,7 +1,6 @@
 from aus_weather_data.radar.common.frame import (
     BOMRadarFrameMetadata,
     BOMRadarFramePNG,
-    BOMRadarFrameData,
 )
 
 from aus_weather_data.radar.common.location import (

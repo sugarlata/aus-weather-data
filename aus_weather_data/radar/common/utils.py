@@ -2,6 +2,7 @@ import math
 import datetime
 
 
+
 def get_translation_coordinate(
     latitude: float, longitude: float, distance: float, bearing: float
 ) -> tuple:
@@ -49,7 +50,6 @@ def split_filename(filename: str) -> dict:
 
     filename_array = filename.split(".")
     if len(filename_array) != 4:
-        breakpoint()
         raise ValueError("Filename is not in the correct format.")
 
     idr = filename_array[0][:-1]
@@ -80,7 +80,3 @@ def split_filename(filename: str) -> dict:
     }
 
 
-__all__ = [
-    "get_translation_coordinate",
-    "split_filename",
-]
